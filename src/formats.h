@@ -62,6 +62,7 @@
   FORMAT(wav)
   FORMAT(wve)
   FORMAT(xa)
+  FORMAT(mul)
 
 /*--------------------- Plugin or static format handlers ---------------------*/
 

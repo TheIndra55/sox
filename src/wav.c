@@ -1288,7 +1288,7 @@ static int wavwritehdr(sox_format_t * ft, int second_header)
                 return SOX_EOF;
             }
             wFormatTag = WAVE_FORMAT_IMA_ADPCM;
-            wBlockAlign = wChannels * 256; /* reasonable default */
+            wBlockAlign = wChannels * 36; /* reasonable default */
             wBitsPerSample = 4;
             wExtSize = 2;
             wSamplesPerBlock = lsx_ima_samples_in((size_t) 0, (size_t) wChannels, (size_t) wBlockAlign, (size_t) 0);
