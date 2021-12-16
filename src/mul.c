@@ -20,8 +20,10 @@ static int startwrite(sox_format_t * ft)
 {
 	priv_t* mul = (priv_t*) ft->priv;
 
+	lsx_ima_init_table();
+
 	int channels = ft->signal.channels;
-	mul->blockAlign = channels * 36;
+	mul->blockAlign = 36;
 	mul->samplesPerBlock = lsx_ima_samples_in((size_t) 0, (size_t) channels, (size_t) mul->blockAlign, (size_t) 0);
 
 	mul->samples = lsx_malloc(channels * mul->samplesPerBlock * sizeof(short));
@@ -61,7 +63,7 @@ static size_t write_samples(sox_format_t * ft, const sox_sample_t *buf, size_t l
 	// write packet internal header
 	lsx_writedw(ft, numSamples * mul->blockAlign); // bytes remaining
 	lsx_seeki(ft, 16 - 4, SEEK_CUR);
-	
+
 	for (int i = 0; i < numSamples; i++)
 	{
 		for (int j = 0; j < mul->samplesPerBlock; j++)
@@ -109,7 +111,7 @@ static int stopwrite(sox_format_t * ft)
 LSX_FORMAT_HANDLER(mul)
 {
 	static char const * const names[] = {"mul", NULL};
-	static unsigned const write_encodings[] = {SOX_ENCODING_IMA_ADPCM, 4, 0, 0};
+	static unsigned const write_encodings[] = {SOX_ENCODING_SIGN2, 16, 0, 0};
 
 	static sox_format_handler_t const handler = {
 		SOX_LIB_VERSION_CODE, "MultiplexStream", names, 0,
