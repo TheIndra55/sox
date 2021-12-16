@@ -12,6 +12,8 @@ typedef struct
 	int samplesPerBlock;
 	int blockAlign;
 	int state[16];
+
+	int padding_length;
 } priv_t;
 
 static int startwrite(sox_format_t * ft)
@@ -49,6 +51,7 @@ static size_t write_samples(sox_format_t * ft, const sox_sample_t *buf, size_t l
 	priv_t* mul = (priv_t*) ft->priv;
 	
 	int numSamples = (len / mul->samplesPerBlock);
+	size_t tell = lsx_tell(ft);
 
 	// write packet header
 	lsx_writedw(ft, 0); // sound packet
@@ -58,7 +61,7 @@ static size_t write_samples(sox_format_t * ft, const sox_sample_t *buf, size_t l
 	// write packet internal header
 	lsx_writedw(ft, numSamples * mul->blockAlign); // bytes remaining
 	lsx_seeki(ft, 16 - 4, SEEK_CUR);
-
+	
 	for (int i = 0; i < numSamples; i++)
 	{
 		for (int j = 0; j < mul->samplesPerBlock; j++)
@@ -68,6 +71,26 @@ static size_t write_samples(sox_format_t * ft, const sox_sample_t *buf, size_t l
 
 		lsx_ima_block_mash_i((unsigned) ft->signal.channels, mul->samples, mul->samplesPerBlock, mul->state, mul->packet, 9);
 		lsx_writebuf(ft, mul->packet, mul->blockAlign);
+	}
+
+	mul->padding_length += lsx_tell(ft) - tell;
+
+	// todo find right calculation for game padding so game doesnt shit when loading the buffer
+	//if (mul->padding_length > 60000)
+	{
+		int remaining = 65536 - mul->padding_length - 16;
+
+		// write a padding packet
+		lsx_writedw(ft, 2);
+		lsx_writedw(ft, remaining);
+		lsx_seeki(ft, 16 - 8, SEEK_CUR);
+
+		lsx_seeki(ft, remaining - 4, SEEK_CUR);
+		lsx_writedw(ft, 0);
+
+		mul->padding_length = 0;
+
+		return len;
 	}
 
 	return len;
