@@ -1,0 +1,21 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y make automake-1.15 autoconf-archive pkgconf x86_64-w64-mingw32-gcc
+        autoreconf -i
+        
+    - name: Configure
+      run: ./configure CC=x86_64-w64-mingw32-gcc --disable-shared --host=x86_64-w64-mingw32
+      
+    - name: Make
+      run: make
