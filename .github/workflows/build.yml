@@ -19,3 +19,8 @@ jobs:
       
     - name: Make
       run: make
+      
+    - uses: actions/upload-artifact@v2
+      with:
+        name: sox
+        path: src/sox.exe
