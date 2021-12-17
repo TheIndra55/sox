@@ -11,7 +11,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        sudo apt-get install -y make automake-1.15 autoconf-archive pkgconf x86_64-w64-mingw32-gcc
+        sudo apt-get install -y make automake-1.15 autoconf-archive pkgconf mingw-w64
         autoreconf -i
         
     - name: Configure
